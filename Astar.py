@@ -45,7 +45,7 @@ def astar(matrix, start, end):
     
     labierta.append(nodo_origen)
     
-    while(len(labierta) > 0):
+    while len(labierta) > 0:
         nodo_actual = labierta[0]
         indice = 0
         
@@ -57,7 +57,7 @@ def astar(matrix, start, end):
         lcerrada.append(nodo_actual)
         labierta.pop(indice)
         
-        if(nodo_actual == nodo_destino):
+        if nodo_actual == nodo_destino:
             path = []
             actual = nodo_actual
             while actual is not None:
@@ -70,19 +70,19 @@ def astar(matrix, start, end):
                 nx = nodo_actual.position[0] + dir[0]
                 ny = nodo_actual.position[1] + dir[1]
                 
-                if(nx >= 0 and nx < len(matrix[0]) and ny >= 0 and ny < len(matrix)):
-                    if(matrix[nx][ny] != -3):                
+                if len(matrix[0]) > nx >= 0 <= ny < len(matrix):
+                    if matrix[nx][ny] != -3:
                         nuevo_nodo = Node(nodo_actual,[nx, ny], matrix[nx][ny])
                         nuevo_nodo.g = nodo_origen.g + 1
-                        nuevo_nodo.h = dist(nuevo_nodo.position, nodo_destino.position) + matrix[nx][ny]                    
+                        nuevo_nodo.h = dist(nuevo_nodo.position, nodo_destino.position) + matrix[nx][ny]
                         nuevo_nodo.f = nuevo_nodo.g + nuevo_nodo.h
-                
-                        if(nuevo_nodo not in labierta and nuevo_nodo not in lcerrada):
+
+                        if nuevo_nodo not in labierta and nuevo_nodo not in lcerrada:
                             labierta.append(nuevo_nodo)
-                            
-                        elif(nuevo_nodo in labierta):
+
+                        elif nuevo_nodo in labierta:
                             i = labierta.index(nuevo_nodo)
-                            if(nuevo_nodo.g > labierta[i].g):
+                            if nuevo_nodo.g > labierta[i].g:
                                 labierta.pop(i)
                                 labierta.append(nuevo_nodo)
                             
@@ -111,7 +111,7 @@ class MyApp(QMainWindow):
             x = random.randint(0,rows)
             y = random.randint(0,columns)
                 
-            while(self.board[x][y] != 0):
+            while self.board[x][y] != 0:
                 x = random.randint(0,rows)
                 y = random.randint(0,columns)
             self.board[x][y] = self.ui.alt_obst.value()
@@ -136,28 +136,33 @@ class MyApp(QMainWindow):
         for i in range(nrows):
             for j in range(ncol):
                 cell = self.ui.boardMatrix.item(i,j).text()
-                if(cell == "w" or cell == "W" or "WAYPOINT" in cell):
+                if cell == "w" or "W" in cell or "WAYPOINT" in cell:
                     self.board[i][j] = -5
-                    if([i,j] not in self.waypoints):
+                    if [i,j] not in self.waypoints:
                         self.waypoints.append([i,j])
-                elif("RIESGO" in cell or "r" in cell):
+                elif "RIESGO" in cell or "r" in cell or "R" in cell:
                     self.riesgo[i][j] = int(cell[-1:])
                     self.board[i][j] = -6
-                elif("META" in cell or "m" in cell or "M" in cell):                    
+                elif "M" in cell or "m" in cell or "M" in cell:
                     self.board[i][j] = -1
                     if([i,j] not in self.meta):
                         self.meta.append([i,j])
-                elif("ORIGEN" in cell or "o" in cell or "O" in cell):
+                elif "O" in cell or "o" in cell or "O" in cell:
                     self.board[i][j] = -2
-                    if([i,j] not in self.origen):
+                    if[i,j] not in self.origen:
                         self.origen.append([i,j])
-                elif(cell == ""):
+                elif cell == "":
                     self.board[i][j] = 0
-                elif(cell != "X" and cell != "T"):
-                    num = int(cell)
-                    if(num >= 1 and num <= 10):          
-                        self.board[i][j] = num                                                                                
-                    else:
+                elif cell != "X" and cell != "T":
+                    try:
+                        num = int(cell)
+                        if num >= 1 and num <= 10:
+                            self.board[i][j] = num
+                        elif num > 10:
+                            self.board[i][j] = 10
+                        else:
+                            self.board[i][j] = 0
+                    except ValueError:
                         self.board[i][j] = 0
                         
         for w in self.waypoints:
@@ -174,29 +179,28 @@ class MyApp(QMainWindow):
         
         for i, row in enumerate(self.board):
             for j, cell in enumerate(row):
-                if(cell >= 1 and cell <=10): 
+                if cell >= 1 and cell <=10:
                     cadena = str(int(cell))
                     self.ui.boardMatrix.setItem(i,j, QTableWidgetItem(cadena))
                     self.ui.boardMatrix.item(i, j).setBackground(QtGui.QColor(115,140-(20*(int(cell))),0))
                     self.ui.boardMatrix.item(i, j).setForeground(QtGui.QColor(255,255,255))
-                #Meta = m, Origen = o
-                elif(cell == -1): 
-                    self.ui.boardMatrix.setItem(i,j, QTableWidgetItem("META " + str(self.meta.index([i,j]))))
+                elif cell == -1:
+                    self.ui.boardMatrix.setItem(i,j, QTableWidgetItem("M " + str(self.meta.index([i,j]))))
                     self.ui.boardMatrix.item(i, j).setBackground(QtGui.QColor(150,115,0))
                     self.ui.boardMatrix.item(i, j).setForeground(QtGui.QColor(255,255,255))
-                elif(cell == -5): 
-                    self.ui.boardMatrix.setItem(i,j, QTableWidgetItem("WAYPOINT " + str(self.waypoints.index([i,j]) + 1)))
+                elif cell == -5:
+                    self.ui.boardMatrix.setItem(i,j, QTableWidgetItem("W " + str(self.waypoints.index([i,j]) + 1)))
                     self.ui.boardMatrix.item(i, j).setBackground(QtGui.QColor(165,125,0))
                     self.ui.boardMatrix.item(i, j).setForeground(QtGui.QColor(255,255,255))
-                elif(cell == -6):
-                    self.ui.boardMatrix.setItem(i,j, QTableWidgetItem("RIESGO " + str(int(self.riesgo[i][j]))))
+                elif cell == -6:
+                    self.ui.boardMatrix.setItem(i,j, QTableWidgetItem("R " + str(int(self.riesgo[i][j]))))
                     self.ui.boardMatrix.item(i, j).setBackground(QtGui.QColor(200,0,0))
                     self.ui.boardMatrix.item(i, j).setForeground(QtGui.QColor(225,190,0))
-                elif(cell == -2): 
-                    self.ui.boardMatrix.setItem(i,j, QTableWidgetItem("ORIGEN " + str(self.origen.index([i,j]))))
+                elif cell == -2:
+                    self.ui.boardMatrix.setItem(i,j, QTableWidgetItem("O " + str(self.origen.index([i,j]))))
                     self.ui.boardMatrix.item(i, j).setBackground(QtGui.QColor(150,115,0))
                     self.ui.boardMatrix.item(i, j).setForeground(QtGui.QColor(255,255,255))
-                elif(cell == 0): 
+                elif cell == 0:
                     self.ui.boardMatrix.setItem(i,j, QTableWidgetItem(""))
                     self.ui.boardMatrix.item(i, j).setBackground(QtGui.QColor(80,155,0))
                     self.ui.boardMatrix.item(i, j).setForeground(QtGui.QColor(255,255,255))
@@ -244,12 +248,12 @@ class MyApp(QMainWindow):
         self.ui.boardMatrix.setItem(node[0],node[1], QTableWidgetItem("O"))
         self.ui.boardMatrix.setItem(past_node[0],past_node[1], QTableWidgetItem("X"))
             
-        if(self.save_board[node[0], node[1]] != 0):
+        if self.save_board[node[0], node[1]] != 0:
             self.ui.boardMatrix.item(node[0], node[1]).setBackground(QtGui.QColor(115,140-(20*self.save_board[node[0]][node[1]]),0))
         else:
             self.ui.boardMatrix.item(node[0],node[1]).setBackground(QtGui.QColor(80,155,0))
             
-        if(self.save_board[past_node[0], past_node[1]] != 0):
+        if self.save_board[past_node[0], past_node[1]] != 0:
             self.ui.boardMatrix.item(past_node[0], past_node[1]).setBackground(QtGui.QColor(115,140-(20*self.save_board[past_node[0]][past_node[1]]),0))
         else:                  
             self.ui.boardMatrix.item(past_node[0],past_node[1]).setBackground(QtGui.QColor(80,155,0))
@@ -257,13 +261,14 @@ class MyApp(QMainWindow):
         self.ui.boardMatrix.item(node[0], node[1]).setForeground(QtGui.QColor(80,0,0))
         self.ui.boardMatrix.item(past_node[0], past_node[1]).setForeground(QtGui.QColor(0 + (200/(param+1)), 0, 255 - (255/(param+1))))
         if node in self.waypoints:
-            self.ui.boardMatrix.setItem(node[0], node[1], QTableWidgetItem("WAYPOINT " + str(self.waypoints.index([node[0], node[1]]) + 1)))
+            self.ui.boardMatrix.setItem(node[0], node[1], QTableWidgetItem("W " + str(self.waypoints.index([node[0], node[1]]) + 1)))
             self.ui.boardMatrix.item(node[0], node[1]).setBackground(QtGui.QColor(165, 125, 0))
             self.ui.boardMatrix.item(node[0], node[1]).setForeground(QtGui.QColor(255, 255, 255))
         if past_node in self.waypoints:
-            self.ui.boardMatrix.setItem(past_node[0], past_node[1], QTableWidgetItem("WAYPOINT " + str(self.waypoints.index([past_node[0], past_node[1]]) + 1)))
+            self.ui.boardMatrix.setItem(past_node[0], past_node[1], QTableWidgetItem("W " + str(self.waypoints.index([past_node[0], past_node[1]]) + 1)))
             self.ui.boardMatrix.item(past_node[0], past_node[1]).setBackground(QtGui.QColor(165, 125, 0))
             self.ui.boardMatrix.item(past_node[0], past_node[1]).setForeground(QtGui.QColor(255, 255, 255))
+
 
     def tormenta(self, pos_storm, node, past_node, step, pos_end):
         msg = QMessageBox()
@@ -280,7 +285,7 @@ class MyApp(QMainWindow):
         self.ui.boardMatrix.setItem(node[0],node[1], QTableWidgetItem("X"))                
         self.ui.boardMatrix.item(past_node[0], past_node[1]).setForeground(QtGui.QColor(200,0,0))
 
-        if(self.board[node[0], node[1]] != 0):
+        if self.board[node[0], node[1]] != 0:
             self.ui.boardMatrix.item(node[0], node[1]).setBackground(QtGui.QColor(115,140-(20*self.board[node[0]][node[1]]),0))
             self.ui.boardMatrix.item(past_node[0], past_node[1]).setBackground(QtGui.QColor(115,140-(20*self.board[node[0]][node[1]]),0))
         else:                    
@@ -311,17 +316,17 @@ class MyApp(QMainWindow):
         
         for i, row in enumerate(self.board):
             for j, cell in enumerate(row):
-                if(cell >= self.ui.alt_max.value()):
+                if cell >= self.ui.alt_max.value():
                     self.board[i][j] = -3
-                elif(cell == -2):
+                elif cell == -2:
                     origen = origen + 1
-                elif(cell == -1):
+                elif cell == -1:
                     meta = meta + 1
-                elif(cell == -6):
+                elif cell == -6:
                     riesgos.append([i,j])
                 else: self.board[i][j] = 0
         
-        if(meta == 0 or origen == 0):
+        if meta == 0 or origen == 0:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Critical)
             msg.setText("Datos incorrectos")
@@ -330,7 +335,7 @@ class MyApp(QMainWindow):
             msg.setStandardButtons(QMessageBox.Ok)
             val = msg.exec_()
             
-        if(meta != origen):
+        if meta != origen:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Critical)
             msg.setText("Datos incorrectos")
@@ -358,7 +363,6 @@ class MyApp(QMainWindow):
             paths = []
             past_nodes = []
             complete = True
-            maxlen = 0
             step = np.zeros(len(vehiculos))
             
             for i in range(len(vehiculos)):
@@ -370,22 +374,22 @@ class MyApp(QMainWindow):
                 else: 
                     paths.append(npath)
                     past_nodes.append(npath[0])
-                    if(len(npath) > maxlen):
-                        maxlen = len(npath)
-            if(complete):
+            if complete:
                 i = 0
-                while i < (maxlen + 1):
+                checks = np.zeros(len(vehiculos))
+                while 0.0 in checks:
                     ocupados = []
 
                     for j, path in enumerate(paths):
                         if i < len(path):
+
                             self.shownode(path[i], past_nodes[j],j)
                             past_nodes[j] = path[i]
 
                             if path[i] in vehiculos[j]:
                                 step[j] = step[j] + 1
 
-                            if(path[i] in ocupados):
+                            if path[i] in ocupados:
                                 msg = QMessageBox()
                                 msg.setIcon(QMessageBox.Warning)
                                 msg.setText("Se ha producido una colisión en " + str(path[i+1][0] + 1) + ", " + str(path[i+1][1] + 1))
@@ -412,8 +416,7 @@ class MyApp(QMainWindow):
 
 
                                     del paths[j][i+1:]
-                                    if nuevo_path is not None : paths[j].extend(nuevo_path)
-                                    if len(paths[j]) > maxlen : maxlen = len(paths[j])+1
+                                    if nuevo_path is not None: paths[j].extend(nuevo_path)
 
                                     for index, t_path in enumerate(paths):
                                         if nt in t_path and index != j:
@@ -426,12 +429,13 @@ class MyApp(QMainWindow):
 
                                             del paths[index][i + 1:]
                                             if auxp is not None: paths[index].extend(auxp)
-                                            if len(paths[index]) > maxlen:
-                                                maxlen = len(paths[index]) + 1
+
                             ocupados.append(past_nodes[j])
-                            
-                        elif(i == len(path)):
+
+                        elif i == len(path):
                             self.shownode(past_nodes[j],past_nodes[j],j)
+                            checks[j] = 1.0
+
                     time.sleep(0.2 / v_ejec)
                     app.processEvents()
                     i = i + 1

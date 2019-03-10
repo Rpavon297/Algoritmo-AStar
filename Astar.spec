@@ -3,8 +3,8 @@
 block_cipher = None
 
 
-a = Analysis(['Astar.py'],
-             pathex=['C:\\Users\\roberto\\Documents\\IC'],
+a = Analysis(['astar.py'],
+             pathex=['C:\\Users\\roberto\\PycharmProjects\\AStar'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -23,10 +23,10 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='Astar',
+          name='astar',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
           runtime_tmpdir=None,
-          console=True )
+          console=False )
