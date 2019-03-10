@@ -11,6 +11,8 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QAction, QTableW
 from PyQt5 import uic, QtGui
 
 
+
+#ROBERTO PAVON BENITEZ
 class Node:
     def __init__(self, parent = None, position = None, value = 0):
         self.parent = parent
